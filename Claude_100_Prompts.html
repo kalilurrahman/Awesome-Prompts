@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Prompts Download Center</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom transitions */
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .accordion-content.open {
+            max-height: 4000px; /* Large enough to fit content */
+            opacity: 1;
+        }
+        
+        /* Glass effect utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Diagonal background styling */
+        .watermark-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8rem; /* Equivalent to gap-32 */
+            overflow: hidden;
+            opacity: 0.03;
+            user-select: none;
+        }
+        .watermark-text {
+            transform: rotate(-30deg);
+            color: #0f172a; /* Slate 900 */
+            font-size: 3.75rem; /* 6xl */
+            font-weight: 900; /* Black */
+            white-space: nowrap;
+        }
+        @media (min-width: 768px) {
+            .watermark-text {
+                font-size: 6rem; /* 8xl */
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen relative overflow-x-hidden">
+    
+    <!-- Watermark Container -->
+    <div id="watermark-bg" class="watermark-container">
+        <!-- JS will populate this -->
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="relative z-10 p-4 md:p-8 lg:p-12">
+        <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+            
+            <!-- Header Section -->
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-violet-600 p-6 md:p-8 text-white">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <i data-lucide="book-open" class="w-8 h-8 opacity-90"></i>
+                                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight">Prompts Download Center</h1>
+                            </div>
+                            <p class="text-indigo-100 text-base md:text-lg max-w-2xl">
+                                A curated library of 100 comprehensive system prompts designed for high-level reasoning, research, and creative problem-solving.
+                            </p>
+                        </div>
+                        
+                        <!-- Stats Pills -->
+                        <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div id="stat-total" class="text-xl md:text-2xl font-bold">100</div>
+                                <div class="text-[10px] md:text-xs text-indigo-100 uppercase tracking-wider font-medium">Prompts</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div id="stat-categories" class="text-xl md:text-2xl font-bold">0</div>
+                                <div class="text-[10px] md:text-xs text-indigo-100 uppercase tracking-wider font-medium">Topics</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div id="stat-vars" class="text-xl md:text-2xl font-bold">0</div>
+                                <div class="text-[10px] md:text-xs text-indigo-100 uppercase tracking-wider font-medium">Avg Vars</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Control Bar -->
+                <div class="p-6 md:p-8 bg-white/95 backdrop-blur-sm">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="download" class="w-5 h-5 text-indigo-600"></i>
+                        Select Format & Download
+                    </h2>
+                    
+                    <div class="flex flex-col lg:flex-row gap-4 items-stretch">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1" id="format-selector">
+                            <!-- Format Buttons injected by JS -->
+                        </div>
+                        
+                        <button onclick="handleDownload()" class="lg:w-64 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold p-4 flex items-center justify-center gap-3 transition-colors shadow-lg shadow-slate-200 active:scale-95 transform duration-100">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                            <span id="download-btn-text">Download CSV</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Browser -->
+            <div class="grid lg:grid-cols-3 gap-8 items-start">
+                
+                <!-- Left Column: Browser -->
+                <div class="lg:col-span-2 bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex flex-col gap-4 mb-6">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="layers" class="w-5 h-5 text-indigo-600"></i>
+                                Browse Library
+                            </h2>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                                <input 
+                                    type="text" 
+                                    id="search-input"
+                                    placeholder="Search prompts..." 
+                                    class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                >
+                            </div>
+                            
+                            <!-- Complexity Filter -->
+                            <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-200">
+                                <div class="px-2 text-xs font-semibold text-slate-400 flex items-center gap-1">
+                                    <i data-lucide="bar-chart-3" class="w-3 h-3"></i>
+                                    Level
+                                </div>
+                                <div id="complexity-filters" class="flex">
+                                    <!-- Filter buttons injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List Container -->
+                    <div id="prompts-list" class="space-y-4">
+                        <!-- Categories and prompts injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Preview -->
+                <div class="lg:col-span-1">
+                    <div id="preview-card" class="sticky top-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 overflow-hidden transition-all duration-300 opacity-50 translate-y-4">
+                        
+                        <div class="bg-slate-900 p-4 flex items-center justify-between text-white">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-yellow-400"></i>
+                                <span class="font-bold text-sm">Prompt Preview</span>
+                            </div>
+                            <span id="preview-id-badge" class="text-xs bg-white/20 px-2 py-0.5 rounded text-white/90 hidden"></span>
+                        </div>
+
+                        <div id="preview-content" class="p-6 space-y-6">
+                            <!-- Preview content injected by JS -->
+                            <div class="text-center text-slate-400 py-4">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i data-lucide="eye" class="w-8 h-8 text-slate-300"></i>
+                                </div>
+                                <p class="text-sm">Select a prompt from the list to see the detailed preview here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center py-8 border-t border-slate-200 relative z-20">
+                <p class="text-slate-500 text-sm">
+                    Educational Prompts Collection v2.5 • <span id="current-year"></span> • <a href="https://kalilurrahman.github.io/" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 transition-colors">Kalilur Rahman</a> <br />
+                    <span class="text-slate-400 text-xs mt-1 block">Optimized for LLM System Instructions</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const PROMPTS_DATA = [
+            // 1-80 (Existing)
+            { num: 1, name: "Adaptive Learning Architect", category: "Learning & Knowledge", variables: "SUBJECT, CURRENT_LEVEL, LEARNING_STYLE, TIME_AVAILABLE" },
+            { num: 2, name: "Socratic Dialogue Facilitator", category: "Learning & Knowledge", variables: "TOPIC, CLAIM, MY_INITIAL_POSITION" },
+            { num: 3, name: "Interdisciplinary Knowledge Synthesizer", category: "Learning & Knowledge", variables: "PRIMARY_CONCEPT, DISCIPLINE_OF_ORIGIN, TARGET_DISCIPLINES" },
+            { num: 4, name: "Cognitive Bias Detector & Debiasing Coach", category: "Learning & Knowledge", variables: "DECISION, CONTEXT, MY_REASONING_PROCESS" },
+            { num: 5, name: "Conceptual Metaphor Generator", category: "Learning & Knowledge", variables: "COMPLEX_CONCEPT, TARGET_AUDIENCE, PURPOSE" },
+            { num: 6, name: "First-Principles Thinking Coach", category: "Learning & Knowledge", variables: "PROBLEM, CURRENT_ASSUMPTIONS, DESIRED_OUTCOME" },
+            { num: 7, name: "Expertise Acquisition Strategist", category: "Learning & Knowledge", variables: "SKILL, TARGET_LEVEL, CURRENT_LEVEL, TIME_HORIZON" },
+            { num: 8, name: "Argument Mapping & Logical Structure Analyst", category: "Learning & Knowledge", variables: "ARGUMENT, SOURCE, ANALYSIS_GOAL" },
+            { num: 9, name: "Memory Palace Architect", category: "Learning & Knowledge", variables: "INFORMATION_TO_MEMORIZE, INFORMATION_TYPE, RETENTION_GOAL" },
+            { num: 10, name: "Learning Transfer Specialist", category: "Learning & Knowledge", variables: "WHAT_I_LEARNED, ORIGINAL_CONTEXT, TARGET_CONTEXTS" },
+            { num: 11, name: "Research Question Architect", category: "Research & Analysis", variables: "BROAD_TOPIC, DISCIPLINE, RESEARCH_CONTEXT" },
+            { num: 12, name: "Literature Review Synthesizer", category: "Research & Analysis", variables: "RESEARCH_TOPIC, SOURCES, REVIEW_PURPOSE" },
+            { num: 13, name: "Data Interpretation Mentor", category: "Research & Analysis", variables: "DATA, DATA_SOURCE, RESEARCH_QUESTION" },
+            { num: 14, name: "Methodology Design Consultant", category: "Research & Analysis", variables: "RESEARCH_QUESTION, PHENOMENON, CONSTRAINTS" },
+            { num: 15, name: "Critical Reading Strategist", category: "Research & Analysis", variables: "TEXT, READING_PURPOSE, TEXT_TYPE" },
+            { num: 16, name: "Writing Revision Architect", category: "Research & Analysis", variables: "MY_DRAFT, WRITING_GENRE, TARGET_AUDIENCE" },
+            { num: 17, name: "Concept Mapping Facilitator", category: "Research & Analysis", variables: "TOPIC, PURPOSE, FOCUS_QUESTION" },
+            { num: 18, name: "Quantitative Reasoning Coach", category: "Research & Analysis", variables: "QUANTITATIVE_PROBLEM, CONTEXT, AVAILABLE_DATA" },
+            { num: 19, name: "Hypothesis Generation & Testing Facilitator", category: "Research & Analysis", variables: "PHENOMENON, INITIAL_QUESTION, AVAILABLE_RESOURCES" },
+            { num: 20, name: "Peer Review Simulator", category: "Research & Analysis", variables: "MY_PAPER, JOURNAL, PAPER_TYPE" },
+            { num: 21, name: "Knowledge Gap Analyst", category: "Research & Analysis", variables: "TOPIC, WHAT_I_THINK_I_KNOW, LEARNING_GOALS" },
+            { num: 22, name: "Analogical Reasoning Developer", category: "Research & Analysis", variables: "SOURCE_DOMAIN, TARGET_DOMAIN, SPECIFIC_CHALLENGE" },
+            { num: 23, name: "Research Ethics Advisor", category: "Research & Analysis", variables: "RESEARCH_PROJECT, DISCIPLINE, SPECIFIC_ETHICAL_QUESTIONS" },
+            { num: 24, name: "Mental Model Builder", category: "Research & Analysis", variables: "COMPLEX_SYSTEM, MY_CURRENT_UNDERSTANDING, PURPOSE" },
+            { num: 25, name: "Question Formulation Coach", category: "Research & Analysis", variables: "TOPIC, CONTEXT, QUESTION_PURPOSE" },
+            { num: 26, name: "Creative Problem-Solving Facilitator", category: "Creative Thinking", variables: "PROBLEM, CONSTRAINTS, FAILED_SOLUTIONS" },
+            { num: 27, name: "Scenario Planning Architect", category: "Creative Thinking", variables: "FOCAL_QUESTION, TIMEFRAME, KEY_UNCERTAINTIES" },
+            { num: 28, name: "Innovation Catalyst", category: "Creative Thinking", variables: "INNOVATION_CHALLENGE, INNOVATION_TYPE, CONSTRAINTS" },
+            { num: 29, name: "Design Thinking Facilitator", category: "Creative Thinking", variables: "DESIGN_CHALLENGE, TARGET_USERS, SUCCESS_METRICS" },
+            { num: 30, name: "Systems Thinking Coach", category: "Creative Thinking", variables: "SYSTEM, BEHAVIORS_OF_CONCERN, INTERVENTION_GOALS" },
+            { num: 31, name: "Lateral Thinking Generator", category: "Creative Thinking", variables: "CHALLENGE, CURRENT_APPROACH, STUCK_POINTS" },
+            { num: 32, name: "Storytelling Architect", category: "Creative Thinking", variables: "MESSAGE, AUDIENCE, PURPOSE, MEDIUM" },
+            { num: 33, name: "Future-Casting Strategist", category: "Creative Thinking", variables: "DOMAIN, TIMEFRAME, SPECIFIC_INTERESTS" },
+            { num: 34, name: "Metaphorical Thinking Coach", category: "Creative Thinking", variables: "SOURCE_DOMAIN, TARGET_DOMAIN, LEARNING_GOAL" },
+            { num: 35, name: "Possibility Thinking Facilitator", category: "Creative Thinking", variables: "CURRENT_SITUATION, PERCEIVED_LIMITATIONS, ASPIRATIONS" },
+            { num: 36, name: "Insight Generation Catalyst", category: "Creative Thinking", variables: "DATA, CONTEXT, QUESTIONS, ASSUMPTIONS" },
+            { num: 37, name: "Complexity Navigation Guide", category: "Creative Thinking", variables: "COMPLEX_SITUATION, DESIRED_OUTCOMES, UNCERTAINTIES" },
+            { num: 38, name: "Breakthrough Question Designer", category: "Creative Thinking", variables: "SITUATION, CURRENT_QUESTIONS, DESIRED_BREAKTHROUGH" },
+            { num: 39, name: "Paradox Navigation Specialist", category: "Creative Thinking", variables: "PARADOX, CONTEXT, CURRENT_APPROACH" },
+            { num: 40, name: "Assumption Testing Architect", category: "Creative Thinking", variables: "DECISION, STAKES, CURRENT_ASSUMPTIONS" },
+            { num: 41, name: "Reframing Master", category: "Creative Thinking", variables: "SITUATION, CURRENT_FRAME, DESIRED_SHIFT" },
+            { num: 42, name: "Synthesis Architect", category: "Creative Thinking", variables: "MULTIPLE_SOURCES, DOMAIN, PURPOSE" },
+            { num: 43, name: "Collaborative Thinking Facilitator", category: "Creative Thinking", variables: "GROUP_COMPOSITION, THINKING_TASK, GROUP_DYNAMICS" },
+            { num: 44, name: "Counterintuitive Insight Generator", category: "Creative Thinking", variables: "DOMAIN, CONVENTIONAL_WISDOM, ANOMALIES" },
+            { num: 45, name: "Long-Term Thinking Architect", category: "Creative Thinking", variables: "DECISION, CURRENT_TIME_HORIZON, LONG_TERM_ASPIRATIONS" },
+            { num: 46, name: "Constraint-Based Creativity Coach", category: "Creative Thinking", variables: "CREATIVE_CHALLENGE, CONSTRAINTS, CREATIVE_GOAL" },
+            { num: 47, name: "Intellectual Humility Cultivator", category: "Creative Thinking", variables: "BELIEF, CONFIDENCE_LEVEL, EVIDENCE, STAKES" },
+            { num: 48, name: "Emergence Detector", category: "Creative Thinking", variables: "SYSTEM, COMPONENTS, INTERACTIONS, OBSERVED_PATTERNS" },
+            { num: 49, name: "Wisdom Synthesis Facilitator", category: "Creative Thinking", variables: "SITUATION, KNOWLEDGE, EXPERIENCE, VALUES" },
+            { num: 50, name: "Generative Question Architect", category: "Creative Thinking", variables: "DOMAIN, CURRENT_SITUATION, DESIRED_EXPLORATION" },
+            { num: 51, name: "Presentation Design & Delivery Expert", category: "Communication", variables: "PRESENTATION_TOPIC, AUDIENCE, DURATION, OBJECTIVES" },
+            { num: 52, name: "Public Speaking Performance Coach", category: "Communication", variables: "SPEECH_TOPIC, AUDIENCE_SIZE, SETTING, SPEECH_TYPE" },
+            { num: 53, name: "Visual Communication Designer", category: "Communication", variables: "MESSAGE, MEDIUM, AUDIENCE, COMPLEXITY" },
+            { num: 54, name: "Persuasive Communication Strategist", category: "Communication", variables: "OBJECTIVE, AUDIENCE, RESISTANCE_POINTS, CHANNEL" },
+            { num: 55, name: "Audience Analysis & Adaptation Specialist", category: "Communication", variables: "AUDIENCE, MESSAGE, CONTEXT, DESIRED_RESPONSE" },
+            { num: 56, name: "Narrative Structure Architect", category: "Communication", variables: "STORY_PURPOSE, AUDIENCE, KEY_MESSAGES, MEDIUM" },
+            { num: 57, name: "Data Visualization Strategist", category: "Communication", variables: "DATA, INSIGHTS, AUDIENCE, FORMAT" },
+            { num: 58, name: "Meeting Facilitation Expert", category: "Communication", variables: "MEETING_PURPOSE, PARTICIPANTS, TIME, DESIRED_OUTCOMES" },
+            { num: 59, name: "Difficult Conversation Navigator", category: "Communication", variables: "CONVERSATION_TOPIC, RELATIONSHIP, CONCERNS, DESIRED_OUTCOME" },
+            { num: 60, name: "Cross-Cultural Communication Advisor", category: "Communication", variables: "CULTURES_INVOLVED, COMMUNICATION_CONTEXT, OBJECTIVES" },
+            { num: 61, name: "Infographic Design Consultant", category: "Communication", variables: "INFORMATION, TARGET_AUDIENCE, PURPOSE, CONSTRAINTS" },
+            { num: 62, name: "Slide Deck Optimization Specialist", category: "Communication", variables: "PRESENTATION_CONTENT, AUDIENCE, TIME, DELIVERY_MODE" },
+            { num: 63, name: "Video Communication Strategist", category: "Communication", variables: "VIDEO_PURPOSE, PLATFORM, AUDIENCE, LENGTH" },
+            { num: 64, name: "Brand Voice & Messaging Architect", category: "Communication", variables: "BRAND, AUDIENCE, VALUES, DIFFERENTIATION" },
+            { num: 65, name: "Typography & Design Psychology Expert", category: "Communication", variables: "CONTENT_TYPE, AUDIENCE, MEDIUM, OBJECTIVES" },
+            { num: 66, name: "Active Listening & Empathy Coach", category: "Communication", variables: "RELATIONSHIP_CONTEXT, COMMUNICATION_CHALLENGES, GOALS" },
+            { num: 67, name: "Feedback Delivery & Reception Specialist", category: "Communication", variables: "FEEDBACK_TYPE, RECIPIENT, RELATIONSHIP, CONTEXT" },
+            { num: 68, name: "Conflict Resolution Facilitator", category: "Communication", variables: "CONFLICT_DESCRIPTION, PARTIES, STAKES, CONSTRAINTS" },
+            { num: 69, name: "Negotiation Strategy Architect", category: "Communication", variables: "NEGOTIATION_TOPIC, PARTIES, OBJECTIVES, CONSTRAINTS" },
+            { num: 70, name: "Relationship Building & Networking Coach", category: "Communication", variables: "NETWORKING_GOALS, CONTEXT, CURRENT_NETWORK, CONSTRAINTS" },
+            { num: 71, name: "Technical Documentation Architect", category: "Professional Writing", variables: "DOCUMENTATION_SUBJECT, TARGET_USERS, PURPOSE, COMPLEXITY" },
+            { num: 72, name: "Business Case & Proposal Architect", category: "Professional Writing", variables: "PROPOSAL_TYPE, OBJECTIVE, AUDIENCE, CONTEXT" },
+            { num: 73, name: "Executive Communication Strategist", category: "Professional Writing", variables: "COMMUNICATION_TYPE, MESSAGE, AUDIENCE, OBJECTIVE" },
+            { num: 74, name: "Knowledge Transfer & Training Designer", category: "Professional Writing", variables: "KNOWLEDGE_TO_TRANSFER, SOURCE, RECIPIENTS, CONTEXT" },
+            { num: 75, name: "Professional Email & Correspondence Optimizer", category: "Professional Writing", variables: "EMAIL_PURPOSE, RECIPIENT, CONTEXT, DESIRED_OUTCOME" },
+            { num: 76, name: "Strategic Decision-Making Framework Architect", category: "Problem-Solving", variables: "DECISION, STAKES, CONTEXT, ALTERNATIVES" },
+            { num: 77, name: "Complex Problem Decomposition Specialist", category: "Problem-Solving", variables: "PROBLEM_STATEMENT, DOMAIN, UNDERSTANDING, CONSTRAINTS" },
+            { num: 78, name: "Risk Assessment & Mitigation Strategist", category: "Problem-Solving", variables: "INITIATIVE, OBJECTIVES, CONTEXT, RISK_TOLERANCE" },
+            { num: 79, name: "Root Cause Analysis & Prevention Specialist", category: "Problem-Solving", variables: "PROBLEM, HISTORY, IMPACT, PREVIOUS_SOLUTIONS" },
+            { num: 80, name: "Trade-Off Analysis & Optimization Expert", category: "Problem-Solving", variables: "DECISION_CONTEXT, COMPETING_PRIORITIES, STAKEHOLDERS" },
+            
+            // 81-100 (New - Personal Growth, Ethics, Philosophy)
+            { num: 81, name: "Personal Philosophy Architect", category: "Personal Growth", variables: "CORE_VALUES, LIFE_CHALLENGES, PHILOSOPHICAL_INFLUENCES" },
+            { num: 82, name: "Habit Formation Strategist", category: "Personal Growth", variables: "DESIRED_HABIT, CURRENT_ROUTINE, PAST_FAILURES, MOTIVATION" },
+            { num: 83, name: "Flow State Designer", category: "Personal Growth", variables: "ACTIVITY, SKILL_LEVEL, CHALLENGE_LEVEL, ENVIRONMENT" },
+            { num: 84, name: "Emotional Intelligence Coach", category: "Personal Growth", variables: "EMOTIONAL_TRIGGER, TYPICAL_REACTION, DESIRED_OUTCOME" },
+            { num: 85, name: "Resilience Builder", category: "Personal Growth", variables: "ADVERSITY, CURRENT_COPING_MECHANISMS, STRENGTHS" },
+            { num: 86, name: "Cognitive Behavioral Guide", category: "Personal Growth", variables: "NEGATIVE_THOUGHT, TRIGGER_EVENT, EMOTIONAL_CONSEQUENCE" },
+            { num: 87, name: "Career Design Architect", category: "Personal Growth", variables: "SKILLS, VALUES, INTERESTS, MARKET_TRENDS" },
+            { num: 88, name: "Financial Literacy Mentor", category: "Personal Growth", variables: "FINANCIAL_GOAL, CURRENT_SITUATION, TIME_HORIZON" },
+            { num: 89, name: "Time Management Strategist", category: "Personal Growth", variables: "PRIORITIES, TIME_WASTERS, ENERGY_LEVELS, GOALS" },
+            { num: 90, name: "Work-Life Integration Coach", category: "Personal Growth", variables: "PROFESSIONAL_DEMANDS, PERSONAL_NEEDS, BOUNDARIES" },
+            { num: 91, name: "Ethical Dilemma Navigator", category: "Ethics & Wisdom", variables: "DILEMMA, STAKEHOLDERS, CONFLICTING_VALUES" },
+            { num: 92, name: "Value System Clarifier", category: "Ethics & Wisdom", variables: "DECISIONS, BELIEFS, ACTIONS, DISSONANCE" },
+            { num: 93, name: "Bias Mitigation Specialist", category: "Ethics & Wisdom", variables: "DECISION_CONTEXT, POTENTIAL_BIASES, STAKES" },
+            { num: 94, name: "Truth Seeking Partner", category: "Ethics & Wisdom", variables: "CLAIM, EVIDENCE, SOURCE_CREDIBILITY, COUNTERARGUMENTS" },
+            { num: 95, name: "Compassionate Leadership Coach", category: "Ethics & Wisdom", variables: "LEADERSHIP_CHALLENGE, TEAM_DYNAMICS, ORGANIZATIONAL_CULTURE" },
+            { num: 96, name: "Cultural Competence Builder", category: "Ethics & Wisdom", variables: "CULTURAL_CONTEXT, INTERACTION_GOAL, OWN_BACKGROUND" },
+            { num: 97, name: "Digital Wellness Strategist", category: "Ethics & Wisdom", variables: "DIGITAL_HABITS, IMPACT_ON_LIFE, DESIRED_RELATIONSHIP" },
+            { num: 98, name: "Information Diet Nutritionist", category: "Ethics & Wisdom", variables: "INFORMATION_SOURCES, CONSUMPTION_HABITS, COGNITIVE_GOALS" },
+            { num: 99, name: "Serendipity Engineer", category: "Ethics & Wisdom", variables: "AREAS_OF_INTEREST, ROUTINE, SOCIAL_CIRCLE, GOALS" },
+            { num: 100, name: "Legacy Definition Architect", category: "Ethics & Wisdom", variables: "LIFE_STAGE, IMPACT_DESIRED, VALUES, RESOURCES" }
+        ];
+
+        // --- STATE ---
+        let state = {
+            selectedFormat: 'csv',
+            searchTerm: '',
+            complexityFilter: 'all',
+            expandedCategory: 'Learning & Knowledge',
+            previewPrompt: null
+        };
+
+        // --- DOM ELEMENTS ---
+        const elements = {
+            statTotal: document.getElementById('stat-total'),
+            statCategories: document.getElementById('stat-categories'),
+            statVars: document.getElementById('stat-vars'),
+            formatSelector: document.getElementById('format-selector'),
+            downloadBtnText: document.getElementById('download-btn-text'),
+            searchInput: document.getElementById('search-input'),
+            complexityFilters: document.getElementById('complexity-filters'),
+            promptsList: document.getElementById('prompts-list'),
+            previewCard: document.getElementById('preview-card'),
+            previewIdBadge: document.getElementById('preview-id-badge'),
+            previewContent: document.getElementById('preview-content'),
+            currentYear: document.getElementById('current-year'),
+            watermarkBg: document.getElementById('watermark-bg')
+        };
+
+        // --- HELPERS ---
+        const getComplexity = (variablesString) => {
+            const count = variablesString.split(',').length;
+            if (count <= 3) return 'Simple';
+            if (count === 4) return 'Medium';
+            return 'Complex';
+        };
+
+        const getComplexityColor = (level) => {
+            switch (level) {
+                case 'Simple': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                case 'Medium': return 'bg-amber-100 text-amber-700 border-amber-200';
+                case 'Complex': return 'bg-rose-100 text-rose-700 border-rose-200';
+                default: return 'bg-slate-100 text-slate-600';
+            }
+        };
+
+        const getPromptText = (prompt) => {
+            return `You are an expert ${prompt.name} who provides comprehensive guidance.\n\nCONTEXT & ROLE:\nAct as a world-class authority in ${prompt.category}. Your goal is to help me navigate specific challenges using mental models, rigorous analysis, and actionable frameworks.\n\nINPUT VARIABLES:\n${prompt.variables.split(',').map(v => `- [${v.trim()}]`).join('\n')}\n\nINSTRUCTIONS:\n1. Analyze the user's input variables deeply.\n2. Apply relevant frameworks (e.g., First Principles, Systems Thinking, or domain-specific models).\n3. Provide a structured response that includes:\n   - Diagnosis/Analysis\n   - Strategy/Framework Application\n   - Step-by-Step Action Plan\n   - Potential Pitfalls/Counter-arguments\n\nPlease provide comprehensive assistance for my specific situation defined by the variables above.`;
+        };
+
+        // --- GENERATORS ---
+        const generateJSON = () => {
+            const jsonData = PROMPTS_DATA.map(p => ({
+                id: p.num,
+                name: p.name,
+                category: p.category,
+                complexity: getComplexity(p.variables),
+                variables: p.variables.split(',').map(v => v.trim()),
+                prompt: getPromptText(p)
+            }));
+            return JSON.stringify({ 
+                metadata: { title: "Educational Prompts Collection", version: "2.5", total_prompts: 100, created: "January 2026" },
+                prompts: jsonData 
+            }, null, 2);
+        };
+
+        const generateTXT = () => {
+            let txt = "EDUCATIONAL PROMPTS COLLECTION - COMPLETE 100 SET\n" + "=".repeat(60) + "\n\n";
+            txt += "Version: 2.5 | Created: January 2026 | Total: 100/100\n\n";
+            const categories = [...new Set(PROMPTS_DATA.map(p => p.category))];
+            categories.forEach(category => {
+                txt += "\n" + "=".repeat(60) + "\nCATEGORY: " + category.toUpperCase() + "\n" + "=".repeat(60) + "\n\n";
+                PROMPTS_DATA.filter(p => p.category === category).forEach(prompt => {
+                    txt += `[${prompt.num}] ${prompt.name} (${getComplexity(prompt.variables)})\n` + "-".repeat(60) + "\n";
+                    txt += `Variables: ${prompt.variables}\nPrompt: ${getPromptText(prompt)}\n\n`;
+                });
+            });
+            return txt;
+        };
+
+        const generateCSV = () => {
+            const headers = ['id', 'category', 'complexity', 'act', 'variables', 'prompt'];
+            const rows = PROMPTS_DATA.map(p => {
+                const escape = (str) => str.replace(/"/g, '""');
+                return `${p.num},"${p.category}","${getComplexity(p.variables)}","${escape(p.name)}","${escape(p.variables)}","${escape(getPromptText(p))}"`;
+            });
+            return [headers.join(','), ...rows].join('\n');
+        };
+
+        const generateMarkdown = () => {
+            let md = `# Educational Prompts Collection - Complete Library\n\n**Total Prompts:** 100/100\n**Version:** 2.5\n\n---\n\n`;
+            const categories = [...new Set(PROMPTS_DATA.map(p => p.category))];
+            categories.forEach(category => {
+                md += `## ${category}\n\n`;
+                PROMPTS_DATA.filter(p => p.category === category).forEach(prompt => {
+                    md += `### ${prompt.num}. ${prompt.name}\n**Complexity:** ${getComplexity(prompt.variables)}\n**Key Variables:** ${prompt.variables}\n\n\`\`\`text\n${getPromptText(prompt)}\n\`\`\`\n\n---\n\n`;
+                });
+            });
+            return md;
+        };
+
+        // --- RENDER FUNCTIONS ---
+        const renderStats = () => {
+            elements.statTotal.innerText = PROMPTS_DATA.length;
+            elements.statCategories.innerText = [...new Set(PROMPTS_DATA.map(p => p.category))].length;
+            elements.statVars.innerText = Math.round(PROMPTS_DATA.reduce((acc, p) => acc + p.variables.split(',').length, 0) / PROMPTS_DATA.length);
+            elements.currentYear.innerText = new Date().getFullYear();
+        };
+
+        const renderFormatSelector = () => {
+            const formats = [
+                { id: 'csv', icon: 'table', label: 'CSV', desc: 'Spreadsheet' },
+                { id: 'md', icon: 'file-text', label: 'Markdown', desc: 'Documentation' },
+                { id: 'json', icon: 'file-json', label: 'JSON', desc: 'API / Code' },
+                { id: 'txt', icon: 'file-code', label: 'Text', desc: 'Plain Text' }
+            ];
+            
+            elements.formatSelector.innerHTML = formats.map(fmt => `
+                <button onclick="setFormat('${fmt.id}')" 
+                    class="relative p-3 rounded-xl border-2 text-left transition-all duration-200 flex flex-col justify-center ${state.selectedFormat === fmt.id ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900' : 'border-slate-100 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'}">
+                    <div class="flex justify-between items-center mb-1">
+                        <i data-lucide="${fmt.icon}" class="w-5 h-5 ${state.selectedFormat === fmt.id ? 'text-indigo-600' : 'text-slate-400'}"></i>
+                        ${state.selectedFormat === fmt.id ? '<div class="w-2.5 h-2.5 rounded-full bg-indigo-600"></div>' : ''}
+                    </div>
+                    <div class="font-bold text-sm">${fmt.label}</div>
+                    <div class="text-xs opacity-70">${fmt.desc}</div>
+                </button>
+            `).join('');
+            
+            elements.downloadBtnText.innerText = `Download ${state.selectedFormat.toUpperCase()}`;
+            lucide.createIcons();
+        };
+
+        const renderFilters = () => {
+            const levels = ['all', 'simple', 'medium', 'complex'];
+            elements.complexityFilters.innerHTML = levels.map(level => `
+                <button onclick="setFilter('${level}')" 
+                    class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${state.complexityFilter === level ? 'bg-white text-indigo-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'}">
+                    ${level}
+                </button>
+            `).join('');
+        };
+
+        const renderList = () => {
+            const categories = [...new Set(PROMPTS_DATA.map(p => p.category))];
+            let html = '';
+            
+            // Logic to determine filtered prompts
+            const filteredPrompts = PROMPTS_DATA.filter(p => {
+                const complexity = getComplexity(p.variables).toLowerCase();
+                const matchesSearch = 
+                    p.name.toLowerCase().includes(state.searchTerm.toLowerCase()) || 
+                    p.category.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+                    p.variables.toLowerCase().includes(state.searchTerm.toLowerCase());
+                const matchesComplexity = state.complexityFilter === 'all' || complexity === state.complexityFilter;
+                return matchesSearch && matchesComplexity;
+            });
+
+            if (filteredPrompts.length === 0) {
+                elements.promptsList.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i data-lucide="filter" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <p>No prompts match your filters.</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            categories.forEach(category => {
+                const categoryPrompts = filteredPrompts.filter(p => p.category === category);
+                if (categoryPrompts.length === 0) return;
+
+                const isExpanded = state.expandedCategory === category || state.searchTerm.length > 0;
+                
+                html += `
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm">
+                    <button onclick="toggleCategory('${category}')" class="w-full flex items-center justify-between p-4 text-left transition-colors ${isExpanded ? 'bg-indigo-50/50 text-indigo-900' : 'bg-white/50 hover:bg-slate-50'}">
+                        <span class="font-bold text-sm md:text-base">${category}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-medium px-2 py-1 bg-white rounded-md border border-slate-200 text-slate-500">${categoryPrompts.length}</span>
+                            <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                    <div class="accordion-content ${isExpanded ? 'open' : ''}">
+                        <div class="divide-y divide-slate-100 bg-white/50">
+                `;
+
+                categoryPrompts.forEach(prompt => {
+                    const complexity = getComplexity(prompt.variables);
+                    const isSelected = state.previewPrompt && state.previewPrompt.num === prompt.num;
+                    html += `
+                    <div onclick="setPreview(${prompt.num})" class="p-4 hover:bg-slate-50 transition-colors group cursor-pointer border-l-4 ${isSelected ? 'border-l-indigo-600 bg-indigo-50/30' : 'border-l-transparent'}">
+                        <div class="flex items-start gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 text-xs font-bold rounded-md group-hover:bg-indigo-600 group-hover:text-white transition-colors">${prompt.num}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h4 class="font-semibold text-slate-800 text-sm truncate pr-2">${prompt.name}</h4>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full border ${getComplexityColor(complexity)}">${complexity}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 truncate">
+                                    <span class="font-medium text-slate-400">Vars: </span>${prompt.variables}
+                                </p>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                html += `</div></div></div>`;
+            });
+            
+            elements.promptsList.innerHTML = html;
+            lucide.createIcons();
+        };
+
+        const renderPreview = () => {
+            const p = state.previewPrompt;
+            if (!p) {
+                elements.previewCard.classList.add('opacity-50', 'translate-y-4');
+                elements.previewIdBadge.classList.add('hidden');
+                return;
+            }
+
+            elements.previewCard.classList.remove('opacity-50', 'translate-y-4');
+            elements.previewIdBadge.innerText = `#${p.num}`;
+            elements.previewIdBadge.classList.remove('hidden');
+
+            const complexity = getComplexity(p.variables);
+            const complexityClass = getComplexityColor(complexity);
+            
+            elements.previewContent.innerHTML = `
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 leading-tight mb-2">${p.name}</h3>
+                    <div class="flex gap-2 mb-3 flex-wrap">
+                       <span class="inline-block px-2 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-md border border-indigo-100">${p.category}</span>
+                       <span class="inline-block px-2 py-1 text-xs font-semibold rounded-md border ${complexityClass}">${complexity} Complexity</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 relative group">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">System Prompt</h4>
+                    <p class="text-sm text-slate-700 leading-relaxed font-mono whitespace-pre-wrap">${getPromptText(p)}</p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variables Needed</h4>
+                    <div class="flex flex-wrap gap-2">
+                        ${p.variables.split(',').map(v => `<span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded border border-slate-200">${v.trim()}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderWatermark = () => {
+            const count = 24;
+            let html = '';
+            for(let i=0; i<count; i++) {
+                html += '<div class="watermark-text">Kalilur Rahman</div>';
+            }
+            elements.watermarkBg.innerHTML = html;
+        };
+
+        // --- ACTIONS ---
+        window.setFormat = (fmt) => {
+            state.selectedFormat = fmt;
+            renderFormatSelector();
+        };
+
+        window.setFilter = (filter) => {
+            state.complexityFilter = filter;
+            renderFilters();
+            renderList();
+        };
+
+        window.toggleCategory = (category) => {
+            state.expandedCategory = state.expandedCategory === category ? null : category;
+            renderList();
+        };
+
+        window.setPreview = (num) => {
+            state.previewPrompt = PROMPTS_DATA.find(p => p.num === num);
+            renderList(); // re-render to update selection style
+            renderPreview();
+        };
+
+        window.handleDownload = () => {
+            let content = "", filename = "", type = "";
+            switch(state.selectedFormat) {
+                case 'csv': content = generateCSV(); filename = 'prompts.csv'; type = 'text/csv'; break;
+                case 'md': content = generateMarkdown(); filename = 'prompts.md'; type = 'text/markdown'; break;
+                case 'json': content = generateJSON(); filename = 'prompts.json'; type = 'application/json'; break;
+                case 'txt': content = generateTXT(); filename = 'prompts.txt'; type = 'text/plain'; break;
+            }
+            
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // --- INIT ---
+        elements.searchInput.addEventListener('input', (e) => {
+            state.searchTerm = e.target.value;
+            renderList();
+        });
+
+        // Initial Render
+        renderStats();
+        renderFormatSelector();
+        renderFilters();
+        renderList();
+        renderPreview();
+        renderWatermark();
+    </script>
+</body>
+</html>
