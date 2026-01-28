@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Prompts Download Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Accordion Transitions */
+        .accordion-content {
+            transition: grid-template-rows 0.3s ease-out;
+            display: grid;
+            grid-template-rows: 0fr;
+        }
+        .accordion-content.open {
+            grid-template-rows: 1fr;
+        }
+        .accordion-inner {
+            overflow: hidden;
+        }
+
+        /* Diagonal background styling */
+        .watermark-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8rem; 
+            overflow: hidden;
+            opacity: 0.03;
+            user-select: none;
+        }
+        .watermark-text {
+            transform: rotate(-30deg);
+            color: #0f172a; 
+            font-size: 3.75rem; 
+            font-weight: 900; 
+            white-space: nowrap;
+        }
+        @media (min-width: 768px) {
+            .watermark-text {
+                font-size: 6rem; 
+            }
+        }
+        
+        /* Nav Link Styling */
+        nav a {
+            position: relative;
+            color: #475569; 
+            transition: color 0.2s;
+        }
+        nav a:hover, nav a.active {
+            color: #4f46e5; 
+            font-weight: 600;
+        }
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #4f46e5;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen relative overflow-x-hidden">
+    
+    <div id="watermark-bg" class="watermark-container">
+        </div>
+
+    <div class="relative z-10 p-4 md:p-8 lg:p-12">
+        <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+            
+            <nav class="flex justify-center mb-4">
+                <ul class="flex flex-wrap gap-4 md:gap-8 bg-white/80 backdrop-blur-md px-6 py-3 rounded-full shadow-sm border border-slate-200 text-sm md:text-base">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="certifications.html">Certifications</a></li>
+                    <li><a href="index.html#projects">Projects</a></li>
+                    <li><a href="linkedin.html" class="active">LinkedIn Stats</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
+
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-violet-600 p-6 md:p-8 text-white">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <i data-lucide="book-open" class="w-8 h-8 opacity-90"></i>
+                                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight">Educational Prompts Library</h1>
+                            </div>
+                            <p class="text-indigo-100 text-base md:text-lg max-w-2xl">
+                                Complete collection of expert AI prompts designed for high-level reasoning and creative problem-solving.
+                            </p>
+                            <p class="text-indigo-200 text-sm mt-3 font-medium">
+                                A Comprehensive research done by Kalilur Rahman - <a href="https://kalilurrahman.github.io" target="_blank" class="text-white hover:underline transition-all">https://kalilurrahman.github.io</a> , <a href="https://www.linkedin.com/in/kalilurrahman" target="_blank" class="text-white hover:underline transition-all">https://www.linkedin.com/in/kalilurrahman</a>
+                            </p>
+                        </div>
+                        
+                        <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div id="stat-total" class="text-xl md:text-2xl font-bold">--</div>
+                                <div class="text-[10px] md:text-xs text-indigo-100 uppercase tracking-wider font-medium">Prompts</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div id="stat-categories" class="text-xl md:text-2xl font-bold">--</div>
+                                <div class="text-[10px] md:text-xs text-indigo-100 uppercase tracking-wider font-medium">Categories</div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div id="stat-vars" class="text-xl md:text-2xl font-bold">--</div>
+                                <div class="text-[10px] md:text-xs text-indigo-100 uppercase tracking-wider font-medium">Avg Vars</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-8 bg-white/95 backdrop-blur-sm">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="download" class="w-5 h-5 text-indigo-600"></i>
+                        Select Format & Download
+                    </h2>
+                    
+                    <div class="flex flex-col lg:flex-row gap-4 items-stretch">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1" id="format-selector">
+                            </div>
+                        
+                        <button onclick="handleDownload()" class="lg:w-64 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold p-4 flex items-center justify-center gap-3 transition-colors shadow-lg shadow-slate-200 active:scale-95 transform duration-100">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                            <span id="download-btn-text">Download CSV</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                
+                <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex flex-col gap-4 mb-6">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="layers" class="w-5 h-5 text-indigo-600"></i>
+                                Browse Library
+                            </h2>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                                <input 
+                                    type="text" 
+                                    id="search-input"
+                                    placeholder="Search by name or variables..." 
+                                    class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                >
+                                <button id="clear-search" class="hidden absolute right-3 top-1/2 -translate-y-1/2">
+                                    <i data-lucide="x" class="w-4 h-4 text-gray-400 hover:text-gray-600"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="relative sm:w-48">
+                                <select id="category-filter" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="all">All Categories</option>
+                                    </select>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 p-1 bg-slate-100 rounded-lg self-start">
+                            <button onclick="setComplexity('all')" id="comp-all" class="px-3 py-1 text-xs font-medium rounded-md bg-white shadow text-indigo-600">All</button>
+                            <button onclick="setComplexity('Basic')" id="comp-Basic" class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-700">Basic</button>
+                            <button onclick="setComplexity('Intermediate')" id="comp-Intermediate" class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-700">Intermediate</button>
+                            <button onclick="setComplexity('Advanced')" id="comp-Advanced" class="px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-700">Advanced</button>
+                        </div>
+
+                        <div id="results-count" class="text-xs text-slate-500 font-medium">
+                            Showing -- results
+                        </div>
+                    </div>
+
+                    <div id="prompts-list" class="space-y-4">
+                        </div>
+                </div>
+
+                <div class="">
+                    <div id="preview-card" class="sticky top-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 overflow-hidden transition-all duration-300">
+                        
+                        <div class="bg-slate-900 p-4 flex items-center justify-between text-white">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-yellow-400"></i>
+                                <span class="font-bold text-sm">Prompt Preview</span>
+                            </div>
+                            <span id="preview-id-badge" class="text-xs bg-white/20 px-2 py-0.5 rounded text-white/90 hidden"></span>
+                        </div>
+
+                        <div id="preview-content" class="p-6">
+                            <div class="text-center text-slate-400 py-12">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i data-lucide="eye" class="w-8 h-8 text-slate-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-slate-500">Select a prompt to view details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center py-8 border-t border-slate-200 relative z-20">
+                <p class="text-slate-500 text-sm">
+                    Educational Prompts Collection v3.0 • <span id="current-year"></span> • <a href="https://kalilurrahman.github.io/" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 transition-colors">Kalilur Rahman</a> <br />
+                    <span class="text-slate-400 text-xs mt-1 block">Optimized for LLM System Instructions</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA GENERATION ---
+        
+        // Base data from React file
+        const BASE_DATA = [
+          // Learning & Knowledge (1-10)
+          { num: 1, name: "Adaptive Learning Architect", category: "Learning & Knowledge", variables: "SUBJECT, CURRENT_LEVEL, LEARNING_STYLE, TIME_AVAILABLE", complexity: "Advanced" },
+          { num: 2, name: "Socratic Dialogue Facilitator", category: "Learning & Knowledge", variables: "TOPIC, CLAIM, MY_INITIAL_POSITION", complexity: "Advanced" },
+          { num: 3, name: "Interdisciplinary Knowledge Synthesizer", category: "Learning & Knowledge", variables: "PRIMARY_CONCEPT, DISCIPLINE_OF_ORIGIN, TARGET_DISCIPLINES", complexity: "Advanced" },
+          { num: 4, name: "Cognitive Bias Detector & Debiasing Coach", category: "Learning & Knowledge", variables: "DECISION, CONTEXT, MY_REASONING_PROCESS", complexity: "Advanced" },
+          { num: 5, name: "Conceptual Metaphor Generator", category: "Learning & Knowledge", variables: "COMPLEX_CONCEPT, TARGET_AUDIENCE, PURPOSE", complexity: "Intermediate" },
+          { num: 6, name: "First-Principles Thinking Coach", category: "Learning & Knowledge", variables: "PROBLEM, CURRENT_ASSUMPTIONS, DESIRED_OUTCOME", complexity: "Advanced" },
+          { num: 7, name: "Expertise Acquisition Strategist", category: "Learning & Knowledge", variables: "SKILL, TARGET_LEVEL, CURRENT_LEVEL, TIME_HORIZON", complexity: "Advanced" },
+          { num: 8, name: "Argument Mapping & Logical Structure Analyst", category: "Learning & Knowledge", variables: "ARGUMENT, SOURCE, ANALYSIS_GOAL", complexity: "Advanced" },
+          { num: 9, name: "Memory Palace Architect", category: "Learning & Knowledge", variables: "INFORMATION_TO_MEMORIZE, INFORMATION_TYPE, RETENTION_GOAL", complexity: "Intermediate" },
+          { num: 10, name: "Learning Transfer Specialist", category: "Learning & Knowledge", variables: "WHAT_I_LEARNED, ORIGINAL_CONTEXT, TARGET_CONTEXTS", complexity: "Intermediate" },
+
+          // Research & Analysis (11-25)
+          { num: 11, name: "Research Question Architect", category: "Research & Analysis", variables: "BROAD_TOPIC, DISCIPLINE, RESEARCH_CONTEXT", complexity: "Advanced" },
+          { num: 12, name: "Literature Review Synthesizer", category: "Research & Analysis", variables: "RESEARCH_TOPIC, SOURCES, REVIEW_PURPOSE", complexity: "Advanced" },
+          { num: 13, name: "Data Interpretation Mentor", category: "Research & Analysis", variables: "DATA, DATA_SOURCE, RESEARCH_QUESTION", complexity: "Advanced" },
+          { num: 14, name: "Methodology Design Consultant", category: "Research & Analysis", variables: "RESEARCH_QUESTION, PHENOMENON, CONSTRAINTS", complexity: "Advanced" },
+          { num: 15, name: "Critical Reading Strategist", category: "Research & Analysis", variables: "TEXT, READING_PURPOSE, TEXT_TYPE", complexity: "Intermediate" },
+          { num: 16, name: "Writing Revision Architect", category: "Research & Analysis", variables: "MY_DRAFT, WRITING_GENRE, TARGET_AUDIENCE", complexity: "Intermediate" },
+          { num: 17, name: "Concept Mapping Facilitator", category: "Research & Analysis", variables: "TOPIC, PURPOSE, FOCUS_QUESTION", complexity: "Intermediate" },
+          { num: 18, name: "Quantitative Reasoning Coach", category: "Research & Analysis", variables: "QUANTITATIVE_PROBLEM, CONTEXT, AVAILABLE_DATA", complexity: "Intermediate" },
+          { num: 19, name: "Hypothesis Generation & Testing Facilitator", category: "Research & Analysis", variables: "PHENOMENON, INITIAL_QUESTION, AVAILABLE_RESOURCES", complexity: "Advanced" },
+          { num: 20, name: "Peer Review Simulator", category: "Research & Analysis", variables: "MY_PAPER, JOURNAL, PAPER_TYPE", complexity: "Advanced" },
+          { num: 21, name: "Knowledge Gap Analyst", category: "Research & Analysis", variables: "TOPIC, WHAT_I_THINK_I_KNOW, LEARNING_GOALS", complexity: "Intermediate" },
+          { num: 22, name: "Analogical Reasoning Developer", category: "Research & Analysis", variables: "SOURCE_DOMAIN, TARGET_DOMAIN, SPECIFIC_CHALLENGE", complexity: "Advanced" },
+          { num: 23, name: "Research Ethics Advisor", category: "Research & Analysis", variables: "RESEARCH_PROJECT, DISCIPLINE, SPECIFIC_ETHICAL_QUESTIONS", complexity: "Advanced" },
+          { num: 24, name: "Mental Model Builder", category: "Research & Analysis", variables: "COMPLEX_SYSTEM, MY_CURRENT_UNDERSTANDING, PURPOSE", complexity: "Advanced" },
+          { num: 25, name: "Question Formulation Coach", category: "Research & Analysis", variables: "TOPIC, CONTEXT, QUESTION_PURPOSE", complexity: "Intermediate" },
+
+          // Creative Thinking (26-50)
+          { num: 26, name: "Creative Problem-Solving Facilitator", category: "Creative Thinking", variables: "PROBLEM, CONSTRAINTS, FAILED_SOLUTIONS", complexity: "Advanced" },
+          { num: 27, name: "Scenario Planning Architect", category: "Creative Thinking", variables: "FOCAL_QUESTION, TIMEFRAME, KEY_UNCERTAINTIES", complexity: "Advanced" },
+          { num: 28, name: "Innovation Catalyst", category: "Creative Thinking", variables: "INNOVATION_CHALLENGE, INNOVATION_TYPE, CONSTRAINTS", complexity: "Advanced" },
+          { num: 29, name: "Design Thinking Facilitator", category: "Creative Thinking", variables: "DESIGN_CHALLENGE, TARGET_USERS, SUCCESS_METRICS", complexity: "Advanced" },
+          { num: 30, name: "Systems Thinking Coach", category: "Creative Thinking", variables: "SYSTEM, BEHAVIORS_OF_CONCERN, INTERVENTION_GOALS", complexity: "Advanced" },
+          { num: 31, name: "Lateral Thinking Generator", category: "Creative Thinking", variables: "CHALLENGE, CURRENT_APPROACH, STUCK_POINTS", complexity: "Advanced" },
+          { num: 32, name: "Storytelling Architect", category: "Creative Thinking", variables: "MESSAGE, AUDIENCE, PURPOSE, MEDIUM", complexity: "Intermediate" },
+          { num: 33, name: "Future-Casting Strategist", category: "Creative Thinking", variables: "DOMAIN, TIMEFRAME, SPECIFIC_INTERESTS", complexity: "Advanced" },
+          { num: 34, name: "Metaphorical Thinking Coach", category: "Creative Thinking", variables: "SOURCE_DOMAIN, TARGET_DOMAIN, LEARNING_GOAL", complexity: "Advanced" },
+          { num: 35, name: "Possibility Thinking Facilitator", category: "Creative Thinking", variables: "CURRENT_SITUATION, PERCEIVED_LIMITATIONS, ASPIRATIONS", complexity: "Intermediate" },
+          { num: 36, name: "Insight Generation Catalyst", category: "Creative Thinking", variables: "DATA, CONTEXT, QUESTIONS, ASSUMPTIONS", complexity: "Advanced" },
+          { num: 37, name: "Complexity Navigation Guide", category: "Creative Thinking", variables: "COMPLEX_SITUATION, DESIRED_OUTCOMES, UNCERTAINTIES", complexity: "Advanced" },
+          { num: 38, name: "Breakthrough Question Designer", category: "Creative Thinking", variables: "SITUATION, CURRENT_QUESTIONS, DESIRED_BREAKTHROUGH", complexity: "Advanced" },
+          { num: 39, name: "Paradox Navigation Specialist", category: "Creative Thinking", variables: "PARADOX, CONTEXT, CURRENT_APPROACH", complexity: "Advanced" },
+          { num: 40, name: "Assumption Testing Architect", category: "Creative Thinking", variables: "DECISION, STAKES, CURRENT_ASSUMPTIONS", complexity: "Advanced" },
+          { num: 41, name: "Reframing Master", category: "Creative Thinking", variables: "SITUATION, CURRENT_FRAME, DESIRED_SHIFT", complexity: "Intermediate" },
+          { num: 42, name: "Synthesis Architect", category: "Creative Thinking", variables: "MULTIPLE_SOURCES, DOMAIN, PURPOSE", complexity: "Advanced" },
+          { num: 43, name: "Collaborative Thinking Facilitator", category: "Creative Thinking", variables: "GROUP_COMPOSITION, THINKING_TASK, GROUP_DYNAMICS", complexity: "Advanced" },
+          { num: 44, name: "Counterintuitive Insight Generator", category: "Creative Thinking", variables: "DOMAIN, CONVENTIONAL_WISDOM, ANOMALIES", complexity: "Advanced" },
+          { num: 45, name: "Long-Term Thinking Architect", category: "Creative Thinking", variables: "DECISION, CURRENT_TIME_HORIZON, LONG_TERM_ASPIRATIONS", complexity: "Advanced" },
+          { num: 46, name: "Constraint-Based Creativity Coach", category: "Creative Thinking", variables: "CREATIVE_CHALLENGE, CONSTRAINTS, CREATIVE_GOAL", complexity: "Intermediate" },
+          { num: 47, name: "Intellectual Humility Cultivator", category: "Creative Thinking", variables: "BELIEF, CONFIDENCE_LEVEL, EVIDENCE, STAKES", complexity: "Advanced" },
+          { num: 48, name: "Emergence Detector", category: "Creative Thinking", variables: "SYSTEM, COMPONENTS, INTERACTIONS, OBSERVED_PATTERNS", complexity: "Advanced" },
+          { num: 49, name: "Wisdom Synthesis Facilitator", category: "Creative Thinking", variables: "SITUATION, KNOWLEDGE, EXPERIENCE, VALUES", complexity: "Advanced" },
+          { num: 50, name: "Generative Question Architect", category: "Creative Thinking", variables: "DOMAIN, CURRENT_SITUATION, DESIRED_EXPLORATION", complexity: "Advanced" },
+
+          // Communication (51-70)
+          { num: 51, name: "Presentation Design & Delivery Expert", category: "Communication", variables: "PRESENTATION_TOPIC, AUDIENCE, DURATION, OBJECTIVES", complexity: "Intermediate" },
+          { num: 52, name: "Public Speaking Performance Coach", category: "Communication", variables: "SPEECH_TOPIC, AUDIENCE_SIZE, SETTING, SPEECH_TYPE", complexity: "Intermediate" },
+          { num: 53, name: "Visual Communication Designer", category: "Communication", variables: "MESSAGE, MEDIUM, AUDIENCE, COMPLEXITY", complexity: "Intermediate" },
+          { num: 54, name: "Persuasive Communication Strategist", category: "Communication", variables: "OBJECTIVE, AUDIENCE, RESISTANCE_POINTS, CHANNEL", complexity: "Intermediate" },
+          { num: 55, name: "Audience Analysis & Adaptation Specialist", category: "Communication", variables: "AUDIENCE, MESSAGE, CONTEXT, DESIRED_RESPONSE", complexity: "Intermediate" },
+          { num: 56, name: "Narrative Structure Architect", category: "Communication", variables: "STORY_PURPOSE, AUDIENCE, KEY_MESSAGES, MEDIUM", complexity: "Intermediate" },
+          { num: 57, name: "Data Visualization Strategist", category: "Communication", variables: "DATA, INSIGHTS, AUDIENCE, FORMAT", complexity: "Intermediate" },
+          { num: 58, name: "Meeting Facilitation Expert", category: "Communication", variables: "MEETING_PURPOSE, PARTICIPANTS, TIME, DESIRED_OUTCOMES", complexity: "Intermediate" },
+          { num: 59, name: "Difficult Conversation Navigator", category: "Communication", variables: "CONVERSATION_TOPIC, RELATIONSHIP, CONCERNS, DESIRED_OUTCOME", complexity: "Advanced" },
+          { num: 60, name: "Cross-Cultural Communication Advisor", category: "Communication", variables: "CULTURES_INVOLVED, COMMUNICATION_CONTEXT, OBJECTIVES", complexity: "Intermediate" },
+          { num: 61, name: "Infographic Design Consultant", category: "Communication", variables: "INFORMATION, TARGET_AUDIENCE, PURPOSE, CONSTRAINTS", complexity: "Intermediate" },
+          { num: 62, name: "Slide Deck Optimization Specialist", category: "Communication", variables: "PRESENTATION_CONTENT, AUDIENCE, TIME, DELIVERY_MODE", complexity: "Intermediate" },
+          { num: 63, name: "Video Communication Strategist", category: "Communication", variables: "VIDEO_PURPOSE, PLATFORM, AUDIENCE, LENGTH", complexity: "Intermediate" },
+          { num: 64, name: "Brand Voice & Messaging Architect", category: "Communication", variables: "BRAND, AUDIENCE, VALUES, DIFFERENTIATION", complexity: "Intermediate" },
+          { num: 65, name: "Typography & Design Psychology Expert", category: "Communication", variables: "CONTENT_TYPE, AUDIENCE, MEDIUM, OBJECTIVES", complexity: "Intermediate" },
+          { num: 66, name: "Active Listening & Empathy Coach", category: "Communication", variables: "RELATIONSHIP_CONTEXT, COMMUNICATION_CHALLENGES, GOALS", complexity: "Intermediate" },
+          { num: 67, name: "Feedback Delivery & Reception Specialist", category: "Communication", variables: "FEEDBACK_TYPE, RECIPIENT, RELATIONSHIP, CONTEXT", complexity: "Intermediate" },
+          { num: 68, name: "Conflict Resolution Facilitator", category: "Communication", variables: "CONFLICT_DESCRIPTION, PARTIES, STAKES, CONSTRAINTS", complexity: "Advanced" },
+          { num: 69, name: "Negotiation Strategy Architect", category: "Communication", variables: "NEGOTIATION_TOPIC, PARTIES, OBJECTIVES, CONSTRAINTS", complexity: "Advanced" },
+          { num: 70, name: "Relationship Building & Networking Coach", category: "Communication", variables: "NETWORKING_GOALS, CONTEXT, CURRENT_NETWORK, CONSTRAINTS", complexity: "Intermediate" },
+
+          // Professional Writing (71-75)
+          { num: 71, name: "Technical Documentation Architect", category: "Professional Writing", variables: "DOCUMENTATION_SUBJECT, TARGET_USERS, PURPOSE, COMPLEXITY", complexity: "Intermediate" },
+          { num: 72, name: "Business Case & Proposal Architect", category: "Professional Writing", variables: "PROPOSAL_TYPE, OBJECTIVE, AUDIENCE, CONTEXT", complexity: "Advanced" },
+          { num: 73, name: "Executive Communication Strategist", category: "Professional Writing", variables: "COMMUNICATION_TYPE, MESSAGE, AUDIENCE, OBJECTIVE", complexity: "Advanced" },
+          { num: 74, name: "Knowledge Transfer & Training Designer", category: "Professional Writing", variables: "KNOWLEDGE_TO_TRANSFER, SOURCE, RECIPIENTS, CONTEXT", complexity: "Intermediate" },
+          { num: 75, name: "Professional Email & Correspondence Optimizer", category: "Professional Writing", variables: "EMAIL_PURPOSE, RECIPIENT, CONTEXT, DESIRED_OUTCOME", complexity: "Basic" },
+
+          // Problem-Solving (76-80)
+          { num: 76, name: "Strategic Decision-Making Framework Architect", category: "Problem-Solving", variables: "DECISION, STAKES, CONTEXT, ALTERNATIVES", complexity: "Advanced" },
+          { num: 77, name: "Complex Problem Decomposition Specialist", category: "Problem-Solving", variables: "PROBLEM_STATEMENT, DOMAIN, UNDERSTANDING, CONSTRAINTS", complexity: "Advanced" },
+          { num: 78, name: "Risk Assessment & Mitigation Strategist", category: "Problem-Solving", variables: "INITIATIVE, OBJECTIVES, CONTEXT, RISK_TOLERANCE", complexity: "Advanced" },
+          { num: 79, name: "Root Cause Analysis & Prevention Specialist", category: "Problem-Solving", variables: "PROBLEM, HISTORY, IMPACT, PREVIOUS_SOLUTIONS", complexity: "Advanced" },
+          { num: 80, name: "Trade-Off Analysis & Optimization Expert", category: "Problem-Solving", variables: "DECISION_CONTEXT, COMPETING_PRIORITIES, STAKEHOLDERS", complexity: "Advanced" },
+          
+          // Career & Professional Development (81-90)
+          { num: 81, name: "Career Strategy Architect", category: "Career & Professional Development", variables: "CURRENT_ROLE, CAREER_GOALS, SKILLS, TIME_HORIZON, CONSTRAINTS", complexity: "Advanced" },
+          { num: 82, name: "Personal Brand Builder", category: "Career & Professional Development", variables: "PROFESSION, TARGET_AUDIENCE, UNIQUE_VALUE, CURRENT_PRESENCE, GOALS", complexity: "Intermediate" },
+          { num: 83, name: "Leadership Development Coach", category: "Career & Professional Development", variables: "LEADERSHIP_ROLE, CHALLENGES, TEAM_CONTEXT, DEVELOPMENT_GOALS", complexity: "Advanced" },
+          { num: 84, name: "Interview Preparation Strategist", category: "Career & Professional Development", variables: "JOB_ROLE, COMPANY, EXPERIENCE, PREPARATION_TIME, INTERVIEW_TYPE", complexity: "Intermediate" },
+          { num: 85, name: "Salary Negotiation Expert", category: "Career & Professional Development", variables: "OFFER_DETAILS, MARKET_RESEARCH, PRIORITIES, CONSTRAINTS, LEVERAGE_POINTS", complexity: "Advanced" },
+          { num: 86, name: "Performance Review Optimizer", category: "Career & Professional Development", variables: "ROLE, ACHIEVEMENTS, CHALLENGES, GOALS, REVIEW_CONTEXT", complexity: "Intermediate" },
+          { num: 87, name: "Skill Gap Assessment Specialist", category: "Career & Professional Development", variables: "TARGET_ROLE, CURRENT_SKILLS, INDUSTRY, TIMELINE", complexity: "Intermediate" },
+          { num: 88, name: "Professional Pivot Strategist", category: "Career & Professional Development", variables: "CURRENT_CAREER, DESIRED_FIELD, TRANSFERABLE_SKILLS, CONSTRAINTS, TIMELINE", complexity: "Advanced" },
+          { num: 89, name: "Workplace Conflict Navigator", category: "Career & Professional Development", variables: "CONFLICT_SITUATION, PARTIES, WORKPLACE_CULTURE, DESIRED_OUTCOME", complexity: "Advanced" },
+          { num: 90, name: "Executive Presence Developer", category: "Career & Professional Development", variables: "CURRENT_LEVEL, TARGET_LEVEL, SPECIFIC_CHALLENGES, CONTEXT", complexity: "Advanced" }
+        ];
+
+        // Generator for remaining 410 prompts
+        const generateRemainingPrompts = () => {
+            const categories = [
+                "Personal Development", "Health & Wellness", "Relationships & Social", 
+                "Technology & Programming", "Content Creation & Media", "Lifestyle & Entertainment",
+                "Education & Learning", "Professional Services", "Science & Environment", 
+                "Project Management", "Design & User Experience", "Data & Analytics", "Operations & Logistics"
+            ];
+            const additional = [];
+            let currentNum = 91;
+            for (let i = 0; i < 410; i++) {
+                const category = categories[i % categories.length];
+                additional.push({
+                    num: currentNum++,
+                    name: `${category} Specialist - Model ${i + 1}`,
+                    category,
+                    variables: "VARIABLE1, VARIABLE2, VARIABLE3, VARIABLE4",
+                    complexity: i % 3 === 0 ? "Advanced" : i % 3 === 1 ? "Intermediate" : "Basic"
+                });
+            }
+            return additional;
+        };
+
+        const ALL_PROMPTS = [...BASE_DATA, ...generateRemainingPrompts()];
+
+        // --- STATE & UTILS ---
+        let state = {
+            selectedFormat: 'csv',
+            searchTerm: '',
+            selectedCategory: 'all',
+            selectedComplexity: 'all',
+            expandedCategory: null,
+            previewPrompt: null,
+            copied: false
+        };
+
+        const getPromptTemplate = (p) => {
+            return `You are an expert ${p.name} who provides comprehensive guidance. For ${p.variables.split(',').map(v => `[${v.trim()}]`).join(', ')}, provide detailed, structured analysis and actionable recommendations based on best practices in ${p.category}.`;
+        };
+
+        const getComplexityColor = (level) => {
+            if (level === 'Basic') return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+            if (level === 'Intermediate') return 'bg-blue-100 text-blue-700 border-blue-200';
+            return 'bg-purple-100 text-purple-700 border-purple-200';
+        };
+
+        // --- RENDER FUNCTIONS ---
+        const dom = {
+            statTotal: document.getElementById('stat-total'),
+            statCategories: document.getElementById('stat-categories'),
+            statVars: document.getElementById('stat-vars'),
+            formatSelector: document.getElementById('format-selector'),
+            downloadBtnText: document.getElementById('download-btn-text'),
+            searchInput: document.getElementById('search-input'),
+            categoryFilter: document.getElementById('category-filter'),
+            promptsList: document.getElementById('prompts-list'),
+            previewCard: document.getElementById('preview-card'),
+            previewContent: document.getElementById('preview-content'),
+            previewBadge: document.getElementById('preview-id-badge'),
+            year: document.getElementById('current-year'),
+            watermark: document.getElementById('watermark-bg'),
+            resultsCount: document.getElementById('results-count'),
+            clearSearch: document.getElementById('clear-search')
+        };
+
+        function renderApp() {
+            renderStats();
+            renderFormats();
+            renderCategoriesDropdown();
+            renderPromptsList();
+            renderPreview();
+            renderComplexityTabs();
+            renderWatermark();
+        }
+
+        function renderStats() {
+            dom.statTotal.innerText = ALL_PROMPTS.length;
+            const uniqueCats = [...new Set(ALL_PROMPTS.map(p => p.category))];
+            dom.statCategories.innerText = uniqueCats.length;
+            const avg = Math.round(ALL_PROMPTS.reduce((acc, p) => acc + p.variables.split(',').length, 0) / ALL_PROMPTS.length);
+            dom.statVars.innerText = avg;
+            dom.year.innerText = new Date().getFullYear();
+        }
+
+        function renderFormats() {
+            const formats = [
+                { id: 'csv', icon: 'table', label: 'CSV', desc: 'Spreadsheets' },
+                { id: 'md', icon: 'file-text', label: 'Markdown', desc: 'Documentation' },
+                { id: 'json', icon: 'file-code', label: 'JSON', desc: 'API/Dev' },
+                { id: 'txt', icon: 'file', label: 'Text', desc: 'Simple' }
+            ];
+
+            dom.formatSelector.innerHTML = formats.map(f => {
+                const isActive = state.selectedFormat === f.id;
+                return `
+                <button onclick="setFormat('${f.id}')" 
+                    class="relative p-3 rounded-xl border-2 text-left transition-all duration-200 flex flex-col justify-center ${isActive ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900' : 'border-slate-100 hover:border-indigo-200 hover:bg-slate-50 text-slate-600'}">
+                    <div class="flex justify-between items-center mb-1">
+                        <i data-lucide="${f.icon}" class="w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+                        ${isActive ? '<div class="w-2.5 h-2.5 rounded-full bg-indigo-600"></div>' : ''}
+                    </div>
+                    <div class="font-bold text-sm">${f.label}</div>
+                    <div class="text-xs opacity-70">${f.desc}</div>
+                </button>`;
+            }).join('');
+            
+            dom.downloadBtnText.innerText = `Download ${state.selectedFormat.toUpperCase()}`;
+            lucide.createIcons();
+        }
+
+        function renderCategoriesDropdown() {
+            const categories = [...new Set(ALL_PROMPTS.map(p => p.category))].sort();
+            const current = dom.categoryFilter.value; // preserve selection
+            
+            // Only rebuild if empty (first load)
+            if (dom.categoryFilter.options.length <= 1) {
+                categories.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.innerText = c;
+                    dom.categoryFilter.appendChild(opt);
+                });
+            }
+        }
+
+        function renderComplexityTabs() {
+            ['all', 'Basic', 'Intermediate', 'Advanced'].forEach(c => {
+                const btn = document.getElementById(`comp-${c}`);
+                if (state.selectedComplexity === c) {
+                    btn.className = "px-3 py-1 text-xs font-medium rounded-md bg-white shadow text-indigo-600 transition-all";
+                } else {
+                    btn.className = "px-3 py-1 text-xs font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all";
+                }
+            });
+        }
+
+        function renderPromptsList() {
+            // Filter
+            const filtered = ALL_PROMPTS.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(state.searchTerm.toLowerCase()) || 
+                                      p.variables.toLowerCase().includes(state.searchTerm.toLowerCase());
+                const matchesCat = state.selectedCategory === 'all' || p.category === state.selectedCategory;
+                const matchesComp = state.selectedComplexity === 'all' || p.complexity === state.selectedComplexity;
+                return matchesSearch && matchesCat && matchesComp;
+            });
+
+            dom.resultsCount.innerText = `Showing ${filtered.length} of ${ALL_PROMPTS.length} prompts`;
+            dom.clearSearch.classList.toggle('hidden', !state.searchTerm);
+
+            if (filtered.length === 0) {
+                dom.promptsList.innerHTML = `<div class="text-center py-8 text-slate-400">No prompts found matching criteria.</div>`;
+                return;
+            }
+
+            // Group by Category
+            const cats = [...new Set(filtered.map(p => p.category))].sort();
+            
+            // Auto expand if searching
+            const isSearching = state.searchTerm.length > 0;
+
+            dom.promptsList.innerHTML = cats.map(cat => {
+                const catPrompts = filtered.filter(p => p.category === cat);
+                const isExpanded = state.expandedCategory === cat || isSearching;
+                
+                return `
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm">
+                    <button onclick="toggleCategory('${cat}')" class="w-full flex items-center justify-between p-4 text-left transition-colors ${isExpanded ? 'bg-indigo-50/50 text-indigo-900' : 'bg-white/50 hover:bg-slate-50'}">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-sm md:text-base">${cat}</span>
+                            <span class="text-xs font-medium px-2 py-0.5 bg-white rounded-md border border-slate-200 text-slate-500">${catPrompts.length}</span>
+                        </div>
+                        <i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}" class="w-4 h-4"></i>
+                    </button>
+                    <div class="accordion-content ${isExpanded ? 'open' : ''}">
+                        <div class="accordion-inner divide-y divide-slate-100 bg-white/50">
+                            ${catPrompts.map(p => {
+                                const isSelected = state.previewPrompt && state.previewPrompt.num === p.num;
+                                return `
+                                <div onclick="selectPrompt(${p.num})" class="p-4 hover:bg-slate-50 transition-colors cursor-pointer border-l-4 ${isSelected ? 'border-l-indigo-600 bg-indigo-50/30' : 'border-l-transparent'}">
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 text-xs font-bold rounded-lg shadow-sm">${p.num}</div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex justify-between items-start mb-1">
+                                                <h4 class="font-semibold text-slate-800 text-sm truncate pr-2">${p.name}</h4>
+                                                <span class="text-[10px] px-2 py-0.5 rounded-full border ${getComplexityColor(p.complexity)}">${p.complexity}</span>
+                                            </div>
+                                            <p class="text-xs text-slate-500 truncate">
+                                                <span class="font-medium text-slate-400">Vars: </span>${p.variables}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+
+        function renderPreview() {
+            const p = state.previewPrompt;
+            if (!p) {
+                // Default state handled in HTML
+                dom.previewBadge.classList.add('hidden');
+                return;
+            }
+
+            dom.previewBadge.classList.remove('hidden');
+            dom.previewBadge.innerText = `#${p.num}`;
+
+            const template = getPromptTemplate(p);
+
+            dom.previewContent.innerHTML = `
+                <div class="animate-fade-in">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-slate-900 leading-tight mb-2">${p.name}</h3>
+                        <div class="flex flex-wrap gap-2 text-sm text-slate-500">
+                           <span>${p.category}</span>
+                           <span>•</span>
+                           <span class="${p.complexity === 'Advanced' ? 'text-purple-600' : 'text-blue-600'} font-medium">${p.complexity}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variables</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${p.variables.split(',').map(v => `<span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs border border-slate-200">${v.trim()}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="relative group">
+                        <div class="absolute right-2 top-2 z-10">
+                            <button onclick="copyToClipboard()" class="p-1.5 bg-white border border-slate-200 rounded-md shadow-sm hover:bg-slate-50 text-slate-500 transition-all">
+                                <i data-lucide="${state.copied ? 'check' : 'copy'}" class="w-4 h-4 ${state.copied ? 'text-green-600' : ''}"></i>
+                            </button>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Prompt Template</h4>
+                        <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-sm text-slate-800 font-mono whitespace-pre-wrap leading-relaxed">${template}</div>
+                    </div>
+                    
+                    <button onclick="copyToClipboard()" class="mt-6 w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-md transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="${state.copied ? 'check' : 'copy'}" class="w-4 h-4"></i>
+                        ${state.copied ? 'Copied to Clipboard!' : 'Copy Prompt'}
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderWatermark() {
+            const count = 24;
+            let html = '';
+            for(let i=0; i<count; i++) {
+                html += '<div class="watermark-text">Kalilur Rahman</div>';
+            }
+            dom.watermark.innerHTML = html;
+        }
+
+        // --- ACTIONS ---
+
+        window.setFormat = (fmt) => {
+            state.selectedFormat = fmt;
+            renderFormats();
+        };
+
+        window.setComplexity = (lvl) => {
+            state.selectedComplexity = lvl;
+            renderComplexityTabs();
+            renderPromptsList();
+        };
+
+        window.toggleCategory = (cat) => {
+            if (state.expandedCategory === cat) {
+                state.expandedCategory = null;
+            } else {
+                state.expandedCategory = cat;
+            }
+            renderPromptsList();
+        };
+
+        window.selectPrompt = (num) => {
+            state.previewPrompt = ALL_PROMPTS.find(p => p.num === num);
+            state.copied = false;
+            renderPromptsList(); // update active state
+            renderPreview();
+            // Scroll preview into view on mobile
+            if (window.innerWidth < 1024) {
+                dom.previewCard.scrollIntoView({ behavior: 'smooth' });
+            }
+        };
+
+        window.copyToClipboard = async () => {
+            if (!state.previewPrompt) return;
+            const text = getPromptTemplate(state.previewPrompt);
+            try {
+                await navigator.clipboard.writeText(text);
+                state.copied = true;
+                renderPreview();
+                setTimeout(() => {
+                    state.copied = false;
+                    renderPreview();
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+        };
+
+        // Download Logic
+        window.handleDownload = () => {
+            const generators = {
+                csv: () => {
+                    const headers = ['id', 'name', 'category', 'complexity', 'variables', 'prompt'];
+                    const rows = ALL_PROMPTS.map(p => 
+                        `${p.num},"${p.name.replace(/"/g, '""')}","${p.category}","${p.complexity}","${p.variables}","${getPromptTemplate(p).replace(/"/g, '""')}"`
+                    );
+                    return [headers.join(','), ...rows].join('\n');
+                },
+                md: () => {
+                    let md = `# Educational Prompts Collection\n\n**Total:** ${ALL_PROMPTS.length}\n\n---\n\n`;
+                    [...new Set(ALL_PROMPTS.map(p => p.category))].sort().forEach(cat => {
+                        md += `## ${cat}\n\n`;
+                        ALL_PROMPTS.filter(p => p.category === cat).forEach(p => {
+                            md += `### ${p.num}. ${p.name}\n**Complexity:** ${p.complexity}\n**Variables:** ${p.variables}\n\`\`\`\n${getPromptTemplate(p)}\n\`\`\`\n\n`;
+                        });
+                    });
+                    return md;
+                },
+                json: () => JSON.stringify({
+                    metadata: { title: "Educational Prompts", total: ALL_PROMPTS.length },
+                    prompts: ALL_PROMPTS.map(p => ({ ...p, prompt: getPromptTemplate(p) }))
+                }, null, 2),
+                txt: () => {
+                    return ALL_PROMPTS.map(p => 
+                        `[${p.num}] ${p.name}\nCategory: ${p.category}\nPrompt: ${getPromptTemplate(p)}\n${"=".repeat(40)}`
+                    ).join('\n\n');
+                }
+            };
+
+            const content = generators[state.selectedFormat]();
+            const types = { csv: 'text/csv', md: 'text/markdown', json: 'application/json', txt: 'text/plain' };
+            
+            const blob = new Blob([content], { type: types[state.selectedFormat] });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `educational_prompts_complete.${state.selectedFormat}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // Event Listeners
+        dom.searchInput.addEventListener('input', (e) => {
+            state.searchTerm = e.target.value;
+            renderPromptsList();
+        });
+
+        dom.categoryFilter.addEventListener('change', (e) => {
+            state.selectedCategory = e.target.value;
+            renderPromptsList();
+        });
+        
+        dom.clearSearch.addEventListener('click', () => {
+            state.searchTerm = '';
+            dom.searchInput.value = '';
+            renderPromptsList();
+        });
+
+        // Initialize
+        renderApp();
+        // Select first item by default
+        selectPrompt(1);
+
+    </script>
+</body>
+</html>
